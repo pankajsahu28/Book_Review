@@ -1,6 +1,10 @@
 import { Request, Response } from 'express';
 import * as AuthService from '../services/auth.service';
 
+/**
+ * Controller for user signup.
+ * Delegates to AuthService and handles HTTP response.
+ */
 
 export const signup = async (req: Request, res: Response) => {
   try {
@@ -10,6 +14,11 @@ export const signup = async (req: Request, res: Response) => {
     res.status(400).json({ error: err.message });
   }
 };
+
+/**
+ * Controller for user login.
+ * Delegates to AuthService and returns JWT token on success.
+ */
 
 export const login = async (req: Request, res: Response) => {
   try {

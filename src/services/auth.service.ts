@@ -2,6 +2,15 @@ import { UserModel } from '../models/user.model';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 
+
+/**
+ * Handles user registration:
+ * - Checks if user already exists
+ * - Hashes the password
+ * - Stores user data in database
+ */
+
+
 export const signup = async (username: string, email: string, password: string) => {
   const existing = await UserModel.findOne({ email });
   if (existing) throw new Error('User already exists');
@@ -11,6 +20,12 @@ export const signup = async (username: string, email: string, password: string) 
 
   return user;
 };
+
+/**
+ * Handles user login:
+ * - Verifies credentials
+ * - Issues JWT token if valid
+ */
 
 export const login = async (email: string, password: string) => {
   const user = await UserModel.findOne({ email });

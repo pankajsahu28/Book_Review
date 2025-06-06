@@ -1,176 +1,182 @@
-##📚 **Book Review API**
--A RESTful API built using Node.js, TypeScript, Express, and MongoDB to manage books and their reviews. Users can sign up, log in, and perform CRUD operations on books and reviews. JWT-based authentication -  ensures secure access to protected routes.
+# 📚 Book Review API
 
--📝 This is a personal assignment project. Kindly follow the steps below to set it up and run locally on http://localhost:5000.
+A RESTful API built with Node.js, TypeScript, Express, and MongoDB for managing books and reviews. Features JWT authentication, CRUD operations, and secure access control.
 
- ##**Project Setup Instructions**.
+## 🚀 Features
 
--1. Clone the Repository.
--git clone https://github.com/your-username/book-review-api.git  .
--cd book-review-api    .
+- User authentication (signup/login) with JWT
+- CRUD operations for books and reviews
+- Role-based ownership (users can only modify their own reviews)
+- Public book browsing with search and pagination
+- Secure password storage with BCrypt hashing
+- TypeScript support for type safety
+- Clean architecture with separation of concerns
 
--2. Install Dependencies
--npm install.
+## 🛠 Technologies Used
 
--3. Setup Environment Variables .
--Create a .env file in the root directory:
+- Node.js
+- Express
+- TypeScript
+- MongoDB (Mongoose)
+- JWT for authentication
+- Bcrypt for password hashing
+- Dotenv for environment variables
 
--cp .env.example .env 
+## ⚙ Setup & Installation
 
--Fill in your MongoDB connection string and secret key:
+### Prerequisites
+- Node.js (v14+)
+- MongoDB (local or cloud instance)
+- npm/yarn
 
--PORT=5000
--MONGO_URI=mongodb://localhost:27017/book-review-db
--JWT_SECRET=your_jwt_secret
+### 1. Clone the Repository
+```bash
+git clone https://github.com/your-username/book-review-api.git
+cd book-review-api
 
--4. Start the Application
-
--npm run dev
-
--App will run on: http://localhost:5000
-
-##🚀 **How to Run Locally (Quick Guide)**
-
--# Clone the project
--git clone https://github.com/your-username/book-review-api.git
--cd book-review-api
-
-# Install dependencies
+2. Install Dependencies
 npm install
 
--# Create .env
--cp .env.example .env
+3. Configure Environment
+Create a .env file:
+cp .env.example .env
 
--# Fill in MongoDB URI and JWT_SECRET
--# Then start the server
--npm run dev
+Edit .env with your configuration:
+PORT=5000
+MONGO_URI=mongodb://localhost:27017/book-review-db
+JWT_SECRET=your_strong_jwt_secret_here
 
--Ensure MongoDB is running locally or use a cloud DB (like MongoDB Atlas).
+4. Start the Application
+npm run dev
 
--App will be accessible at: http://localhost:5000 
+API will be available at: http://localhost:5000
 
--📡 Example API Requests
--All authenticated requests require a Bearer token in the header:
--Authorization: Bearer <your_token_here>
+📡 API Endpoints
+🔐 Authentication
+Method	Endpoint	Description	Auth Required
+POST	/api/signup	Register new user	No
+POST	/api/login	Authenticate user	No
+📘 Books
+Method	Endpoint	Description	Auth Required
+GET	/api/books	Get all books (paginated)	No
+GET	/api/books/search	Search books by title/author	No
+GET	/api/books/:id	Get single book with reviews	No
+POST	/api/books	Create new book	Yes
+PUT	/api/books/:id	Update book	Yes
+DELETE	/api/books/:id	Delete book	Yes
+✍ Reviews
+Method	Endpoint	Description	Auth Required
+POST	/api/books/:id/reviews	Add review to book	Yes
+PUT	/api/books/reviews/:reviewId	Update review	Yes
+DELETE	/api/books/reviews/:reviewId	Delete review	Yes
 
-##🔐 **User Signup**
--POST //api//signup
+📋 Example Requests
+User Signup
+POST /api/signup
+{
+  "username": "john_doe",
+  "email": "john@example.com",
+  "password": "securepassword123"
+}
 
--{
- - "username": "pankaj",
-  -"email": "pankaj@example.com",
-  -"password": "test1234"
--}
+User Login
+POST /api/login
+{
+  "email": "john@example.com",
+  "password": "securepassword123"
+}
 
-##**User Login**
--POST //api//login
+Response:
+{
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+}
 
--{
--  "email": "pankaj@example.com",
- - "password": "test1234"
--}
+Create Book (Authenticated)
+POST /api/books
+Authorization: Bearer <your_token>
+{
+  "title": "The Pragmatic Programmer",
+  "author": "Andrew Hunt, David Thomas",
+  "genre": "Programming"
+}
 
--Response:
+🗃 Database Schema
+User
+{
+  username: { type: String, required: true, unique: true },
+  email: { type: String, required: true, unique: true },
+  password: { type: String, required: true } // hashed
+}
 
+Book
+{
+  title: { type: String, required: true },
+  author: { type: String, required: true },
+  genre: { type: String, required: true },
+  reviews: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Review' }]
+}
 
--{
--  "token": "<JWT_TOKEN>"
--}
-##📘 **Create a Book**
--POST /api/books
--(Requires Token)
+Review
+{
+  book: { type: mongoose.Schema.Types.ObjectId, ref: 'Book', required: true },
+  user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+  rating: { type: Number, min: 1, max: 5, required: true },
+  comment: { type: String, required: true },
+  timestamps: true
+}
 
+🏗 Project Structure
+src/
+├── controllers/       # Route controllers
+├── services/          # Business logic
+├── routes/            # Express route definitions
+├── models/            # Mongoose models
+├── interfaces/        # TypeScript interfaces
+├── middleware/        # Auth middleware
+├── config/            # Database config
+├── utils/             # Helper functions
+└── index.ts           # Application entry point
 
--{
--  "title": "Rich Dad Poor Dad",
- - "author": "Robert Kiyosaki",
- - "genre": "Finance"
--}
-##🔍 **Search Books**
--GET /api/books/search?q=rich
+🧠 Design Decisions
+Authentication: JWT-based stateless authentication
 
-##📖 Get All Books
--GET /api/books?page=1&limit=10
+Security:
 
-##📝 Add Review to Book
--POST /api/books/:id/reviews
--(Requires Token)
+BCrypt for password hashing
 
--{
--  "rating": 5,
- - "comment": "A great financial perspective."
--}
-##✏️ **Update Review**
--PUT /api/books/reviews/:reviewId
--(Requires Token)
+Protected routes with middleware
 
--{
- - "rating": 4,
-  -"comment": "Updated after second read."
--}
-##❌ **Delete Review**
--DELETE /api/books/reviews/:reviewId
--(Requires Token)
+Role-based ownership checks
 
-##🧠 **Design Decisions & Assumptions**
--JWT-based authentication for secure access to user-specific routes.
+Performance:
 
--BCrypt is used for password hashing to ensure security.
+Pagination for book listings
 
--Role-based ownership: Only the user who created a review can edit/delete it.
+Indexed database queries
 
--Books are public: No authentication required to view or search books.
+Type Safety: TypeScript interfaces for all models and requests
 
--Pagination: Implemented in getBooks and getReviewsByBook routes.
+Modularity:
 
--Separation of concerns: Controllers, services, models, and middleware are modularized.
+Clear separation of concerns
 
-##🗃️ **Database Schema Overview
--👤 User**
+Reusable middleware
 
--{
- - username: String,
-  -email: String,
-  -password: String (hashed)
--}
-##📕 **Book**
+Service layer for business logic
 
--Edit
--{
--  title: String,
- - author: String,
- - genre: String,
- - reviews: [ObjectId] // references Review
--}
-##✍️ **Review**
+✅ Testing the API
+Signup: Create a new user account
 
--{
--  book: ObjectId,  // Book reference
--  user: ObjectId,  // User reference
- - rating: Number,  // 1 to 5
- - comment: String,
- - timestamps: true
--}
-##📂 **Project Structure**
+Login: Obtain JWT token
 
--src/
--├── controllers/       # Request handlers
--├── services/          # Business logic
--├── routes/            # Express route definitions
--├── models/            # Mongoose models
--├── interfaces/        # TypeScript interfaces
--├── middleware/        # Auth middleware
--├── config/            # Database config
--└── index.ts           # Entry point
--✅ Checklist for Recruiter/Reviewer
- -Pull the repo
+Books:
 
- -Run npm install
+Create new books (authenticated)
 
- -Create .env using .env.example
+Search and browse books (public)
 
- -Start with npm run dev
+Reviews:
 
- -Visit http://localhost:5000
+Add reviews to books
 
- -Test APIs using Postman or curl (see examples above)
+Update/delete your own reviews
